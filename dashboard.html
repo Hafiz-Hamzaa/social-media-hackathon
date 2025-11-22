@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Mini Social Media</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/brands.min.css" integrity="sha512-WxpJXPm/Is1a/dzEdhdaoajpgizHQimaLGL/QqUIAjIihlQqlPQb1V9vkGs9+VzXD7rgI6O+UsSKl4u5K36Ydw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<header>
+  <div class="user-info">
+    <!-- <div class="avatar">👤</div> -->
+    <h2 id="welcome-user">Welcome, User</h2>
+  </div>
+   <div class="header-right">
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="theme-toggle">
+      <span id="theme-icon">🌙</span>
+    </button>
+  <button onclick="logout()">Logout</button>
+</header>
+
+
+<div class="dashboard-container">
+  <div class="right-side">
+     <div class="search-sort-container">
+    <span class="search-icon"><i class="fa-solid fa-magnifying-glass-location"></i></span>
+    <input type="text" id="search-post" placeholder="Search posts by text or username...">
+
+ <!-- Filter dropdown -->
+  <select id="sort-posts">
+    <option value="latest">Latest First</option>
+    <option value="oldest">Oldest First</option>
+    <option value="most-liked">Most Liked</option>
+  </select>
+
+  </div>
+       
+    <!-- Post Form -->
+ <div class="post-form">
+  <h2>Create Post</h2>
+  <textarea id="post-text" placeholder="Let's Create a Post" rows="4"></textarea>
+  
+  <div class="image-upload-wrapper">
+    <input type="text" id="post-image" placeholder="Image URL (optional)" readonly>
+    <button type="button" id="upload-btn" style="width: 80px; margin: 4px;">Upload</button>
+    <input type="file" id="post-image-upload" accept="image/*" style="display:none;">
+  </div>
+
+  <button id="create-post-btn">Post</button>
+</div>
+
+
+<div id="posts-feed" class="posts-feed"></div>
+
+
+    <!-- Posts Feed -->
+    <div class="posts-feed" id="posts-feed"></div>
+  </div>
+</div>
+
+
+
+
+<!-- Edit Post Modal -->
+<div id="edit-modal" class="modal">
+  <div class="modal-content">
+    <h3>Edit Post</h3>
+    <textarea id="edit-post-text" rows="4"></textarea>
+    <input type="text" id="edit-post-image" placeholder="Image URL (optional)">
+    <div class="modal-buttons">
+      <button id="save-edit-btn">Save</button>
+      <button id="cancel-edit-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<script src="dashboard.js"></script>
+</body>
+</html>
