@@ -29,49 +29,63 @@ function renderPost(postData) {
   postDiv.innerHTML = `
         <h4>${postData.username}</h4>
         <p>${postData.text}</p>
-        ${
-          postData.imgURL
-            ? `<img src="${postData.imgURL}" alt="Post image">`
-            : ""
-        }
+        ${postData.imgURL ? `<img src="${postData.imgURL}" alt="Post image">` : ""}
         <small>${new Date(postData.date).toLocaleString()}</small>
         <div class="post-actions">
             <button class="like-btn">${postData.liked ? "❤️" : "🤍"}</button>
             <span class="like-count">${postData.likes || 0}</span>
             <button class="edit-btn">Edit</button>
-            <button class="delete-btn" style="background-color: 'red';" >Delete</button>
+            <button class="delete-btn" style="background-color: 'red';">Delete</button>
         </div>
-         <div class="comments-section">
-        <h5>Comments</h5>
-        <div class="comments-list"></div>
-        <input type="text" class="comment-input" placeholder="Write a comment...">
-        <button class="add-comment-btn">Add</button>
-    </div>
+        <div class="comments-section">
+            <h5>Comments</h5>
+            <div class="comments-list"></div>
+            <input type="text" class="comment-input" placeholder="Write a comment...">
+            <button class="add-comment-btn">Add</button>
+        </div>
     `;
 
   postsFeed.prepend(postDiv);
 
-  // Comments functionality
+  // Owner check: Hide edit/delete for other users
+  const editBtn = postDiv.querySelector(".edit-btn");
+  const deleteBtn = postDiv.querySelector(".delete-btn");
+  if (loggedUser !== postData.username) {
+    editBtn.style.display = "none";
+    deleteBtn.style.display = "none";
+  }
+
+  // Initialize comments array if not present
+  postData.comments = postData.comments || [];
+
+  // Render existing comments
   const commentsList = postDiv.querySelector(".comments-list");
+  postData.comments.forEach(c => {
+    const commentEl = document.createElement("p");
+    commentEl.textContent = `${c.username}: ${c.text}`;
+    commentsList.appendChild(commentEl);
+  });
+
   const commentInput = postDiv.querySelector(".comment-input");
   const addCommentBtn = postDiv.querySelector(".add-comment-btn");
 
+  // Add comment functionality
   addCommentBtn.addEventListener("click", () => {
     const commentText = commentInput.value.trim();
-    if (commentText === "") return;
+    if (!commentText) return;
 
     const commentEl = document.createElement("p");
-    commentEl.textContent = commentText;
+    commentEl.textContent = `${loggedUser}: ${commentText}`;
     commentsList.appendChild(commentEl);
 
+    // Save comment to postData
+    postData.comments.push({ username: loggedUser, text: commentText });
+    savePostsToStorage();
     commentInput.value = "";
   });
 
-  // Optional: Enter key se bhi comment add karna
   commentInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      addCommentBtn.click();
-    }
+    if (e.key === "Enter") addCommentBtn.click();
   });
 
   // Like button
@@ -79,16 +93,13 @@ function renderPost(postData) {
   const likeCount = postDiv.querySelector(".like-count");
   likeBtn.addEventListener("click", () => {
     postData.liked = !postData.liked;
-    postData.likes = postData.liked
-      ? (postData.likes || 0) + 1
-      : (postData.likes || 1) - 1;
+    postData.likes = postData.liked ? (postData.likes || 0) + 1 : (postData.likes || 1) - 1;
     likeBtn.textContent = postData.liked ? "❤️" : "🤍";
     likeCount.textContent = postData.likes;
     savePostsToStorage();
   });
 
   // Delete button
-  const deleteBtn = postDiv.querySelector(".delete-btn");
   deleteBtn.addEventListener("click", () => {
     if (confirm("Are you sure you want to delete this post?")) {
       postDiv.remove();
@@ -119,6 +130,7 @@ createPostBtn.addEventListener("click", () => {
     date: new Date().toISOString(),
     liked: false,
     likes: 0,
+    comments: []
   };
 
   allPosts.push(newPost);
@@ -137,8 +149,7 @@ searchInput.addEventListener("input", () => {
   document.querySelectorAll(".post-item").forEach((post) => {
     const username = post.querySelector("h4").textContent.toLowerCase();
     const text = post.querySelector("p").textContent.toLowerCase();
-    post.style.display =
-      username.includes(query) || text.includes(query) ? "flex" : "none";
+    post.style.display = username.includes(query) || text.includes(query) ? "flex" : "none";
   });
 });
 
@@ -151,7 +162,6 @@ sortSelect.addEventListener("change", () => {
   let sortedPosts = postsArray.sort((a, b) => {
     const dateA = new Date(a.querySelector("small").textContent);
     const dateB = new Date(b.querySelector("small").textContent);
-
     const likesA = parseInt(a.querySelector(".like-count").textContent) || 0;
     const likesB = parseInt(b.querySelector(".like-count").textContent) || 0;
 
@@ -207,25 +217,18 @@ saveEditBtn.addEventListener("click", () => {
   currentEditingPost.querySelector("p").textContent = editText.value;
   const imgEl = currentEditingPost.querySelector("img");
   if (editImage.value.trim() !== "") {
-    if (imgEl) {
-      imgEl.src = editImage.value;
-    } else {
+    if (imgEl) imgEl.src = editImage.value;
+    else {
       const newImg = document.createElement("img");
       newImg.src = editImage.value;
       newImg.alt = "Post image";
-      currentEditingPost.insertBefore(
-        newImg,
-        currentEditingPost.querySelector("small")
-      );
+      currentEditingPost.insertBefore(newImg, currentEditingPost.querySelector("small"));
     }
-  } else if (imgEl) {
-    imgEl.remove();
-  }
+  } else if (imgEl) imgEl.remove();
 
   allPosts[postIndex].text = editText.value;
   allPosts[postIndex].imgURL = editImage.value.trim();
   savePostsToStorage();
-
   editModal.style.display = "none";
   currentEditingPost = null;
 });
