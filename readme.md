@@ -71,22 +71,6 @@ This project runs fully in the browser — **no backend needed**.
 └─ README.md # Project documentation
 
 
----
-
-## 🎨 Screenshots
-
-### **Login / Signup**
-![Login Screenshot](path-to-screenshot)
-
-### **Dashboard**
-![Dashboard Screenshot](path-to-screenshot)
-
-### **Dark / Light Mode**
-![Dark Mode](path-to-screenshot)  
-![Light Mode](path-to-screenshot)
-
----
-
 ## ⚙️ How It Works
 
 ### **Login Flow**
